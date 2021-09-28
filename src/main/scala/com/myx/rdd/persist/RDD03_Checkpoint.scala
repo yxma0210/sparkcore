@@ -32,7 +32,6 @@ object RDD03_Checkpoint {
     // 检查点路径保存的文件，当作业执行完毕后，不会被删除
     // 一般保存路径都是在分布式存储系统：HDFS
     mapRDD.checkpoint()
-    mapRDD.persist(StorageLevel.DISK_ONLY)
     // 根据相同的key聚合
     val reduceByKeyRDD: RDD[(String, Int)] = mapRDD.reduceByKey(_ + _)
     reduceByKeyRDD.collect().foreach(println)
