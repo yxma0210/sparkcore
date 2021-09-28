@@ -13,6 +13,13 @@
   rdd1.collect().foreach(println)
 ```
   2. 从外部文件创建
+  由外部存储系统的数据集创建RDD 包括：本地的文件系统，所有Hadoop 支持的数据集， 比如HDFS、HBase 等
+  ```
+  val sparkConf =
+    new SparkConf().setMaster("local[*]").setAppName("spark") 
+  val sparkContext = new SparkContext(sparkConf)
+  val fileRDD: RDD[String] = sparkContext.textFile("input")
+```
 
 ## RDD转换算子
   ### Value类型
