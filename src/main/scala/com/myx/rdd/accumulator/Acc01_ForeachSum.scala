@@ -37,6 +37,6 @@ object Acc01_ForeachSum {
     // 一般情况下，累加器会放置在行动算子进行操作
     // 获取累加器的值
     println(sumAcc)
-
+    sc.stop()
   }
 }
