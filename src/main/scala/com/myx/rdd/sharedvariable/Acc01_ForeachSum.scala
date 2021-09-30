@@ -1,4 +1,4 @@
-package com.myx.rdd.accumulator
+package com.myx.rdd.sharedvariable
 
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.rdd.RDD
