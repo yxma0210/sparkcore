@@ -23,7 +23,62 @@ object Demo04_HotCategoryTop10Analysis {
     val sc: SparkContext = new SparkContext(sparkConf)
     // 1、读取原始日志数据
     val actionRDD: RDD[String] = sc.textFile("src/data/user_visit_action.txt")
+    val acc: HotCategoryAccumulator = new HotCategoryAccumulator
+    // 2、注册累加器
+    sc.register(acc,"hotCategory")
 
+    // 3、转换数据结构
+    actionRDD.foreach (
+      action => {
+        val datas: Array[String] = action.split("_")
+        if (datas(6) != "-1") {
+          // 点击
+          acc.add(datas(6), "click")
+        } else if (datas(8) != "null") {
+          val ids: Array[String] = datas(8).split(",")
+          // 下单
+          ids.foreach(
+            id => {
+              acc.add(id,"order")
+            }
+          )
+        } else if ( datas(10) != "null") {
+          val ids: Array[String] = datas(10).split(",")
+          // 支付
+          ids.foreach(
+            id => {
+              acc.add(id,"pay")
+            }
+          )
+        }
+      }
+    )
+
+    // 获取累加器的值
+    val accValue: mutable.Map[String, HotCategory] = acc.value
+    val categories: mutable.Iterable[HotCategory] = accValue.map(_._2)
+
+    // 排序
+    val sortCategry: List[HotCategory] = categories.toList.sortWith(
+      (left, right) => {
+        if (left.clickCount > right.clickCount) {
+          true
+        } else if (left.clickCount == right.clickCount) {
+          if (left.orderCount > right.orderCount) {
+            true
+          } else if (left.orderCount == right.orderCount) {
+            left.payCount > right.payCount
+          } else {
+            false
+          }
+        } else {
+          false
+        }
+      }
+    )
+
+    sortCategry.take(10).foreach(println)
+    sc.stop()
   }
 
   case class HotCategory(cid:String,var clickCount:Int,var orderCount:Int,var payCount:Int)
@@ -38,11 +93,17 @@ object Demo04_HotCategoryTop10Analysis {
     // 创建map集合，用于接收点击流数据
     private val hcMap = mutable.Map[String,HotCategory]()
 
-    override def isZero: Boolean = ???
+    override def isZero: Boolean = {
+      hcMap.isEmpty
+    }
 
-    override def copy(): AccumulatorV2[(String, String), mutable.Map[String, HotCategory]] = ???
+    override def copy(): AccumulatorV2[(String, String), mutable.Map[String, HotCategory]] = {
+      new HotCategoryAccumulator()
+    }
 
-    override def reset(): Unit = ???
+    override def reset(): Unit = {
+      hcMap.clear()
+    }
 
     override def add(v: (String, String)): Unit = {
       val cid = v._1
@@ -59,9 +120,19 @@ object Demo04_HotCategoryTop10Analysis {
     }
 
     override def merge(other: AccumulatorV2[(String, String), mutable.Map[String, HotCategory]]): Unit = {
-
+      val map1: mutable.Map[String, HotCategory] = this.hcMap
+      val map2: mutable.Map[String, HotCategory] = other.value
+      map2.foreach{
+        case (cid,hc) => {
+          val category: HotCategory = map1.getOrElse(cid, HotCategory(cid, 0, 0, 0))
+          category.clickCount += hc.clickCount
+          category.orderCount += hc.orderCount
+          category.payCount += hc.payCount
+          map1.update(cid,category)
+        }
+      }
     }
 
-    override def value: mutable.Map[String, HotCategory] = ???
+    override def value: mutable.Map[String, HotCategory] = hcMap
   }
 }
