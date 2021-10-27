@@ -9,7 +9,7 @@ import org.apache.spark.streaming.{Seconds, StreamingContext}
  * @author mayx
  * @date 2021/10/27 22:51
  */
-object StreamWordCount {
+object SparkStream01_WordCount {
   def main(args: Array[String]): Unit = {
     // 1、初始化Spark的配置信息
     val sparkConf: SparkConf = new SparkConf().setMaster("local[*]").setAppName("SteamWordCount")
