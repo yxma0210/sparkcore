@@ -9,7 +9,7 @@ import org.apache.spark.streaming.{Seconds, StreamingContext}
 import scala.util.Random
 
 /**
- * @Description: 自定义数据源
+ * @Description: 自定义采集器
  * @author mayx
  * @date 2021/10/27 23:44
  */
