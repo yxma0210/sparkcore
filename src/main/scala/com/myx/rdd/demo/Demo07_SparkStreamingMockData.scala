@@ -8,7 +8,7 @@ import scala.collection.mutable.ListBuffer
 import scala.util.Random
 
 /**
- * @Description:
+ * @Description: 模拟数据
  * @author: mayx
  * @date: 2021/11/15 17:52
  */
@@ -54,7 +54,7 @@ object Demo07_SparkStreamingMockData {
       val userid = new Random().nextInt(6) + 1
       val adid = new Random().nextInt(6) + 1
 
-      list.append(s"${System.currentTimeMillis()} ${area},${city},${userid}," +
+      list.append(s"${System.currentTimeMillis()} ${area} ${city} ${userid} " +
         s"${adid}")
     }
     list
