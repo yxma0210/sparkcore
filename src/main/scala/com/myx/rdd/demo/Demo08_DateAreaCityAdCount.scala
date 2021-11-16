@@ -63,9 +63,9 @@ object Demo08_DateAreaCityAdCount {
         val sdf = new SimpleDateFormat("yyyy-MM-dd")
         val day = sdf.format(new java.util.Date(data.ts.toLong))
         val area = data.area
-        val user = data.user
+        val city = data.city
         val ad = data.ad
-        ((day, area, user, ad), 1)
+        ((day, area, city, ad), 1)
       }
     ).reduceByKey(_ + _)
 
